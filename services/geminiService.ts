@@ -4,12 +4,12 @@ import { AnalysisResponse } from '../types';
 import { Language } from '../i18n';
 
 export const analyzeChart = async (file: File, lang: Language): Promise<AnalysisResponse> => {
-  if (!process.env.API_KEY) {
+  if (!process.env.GEMINI_API_KEY) {
     throw new Error("API key manquante. Configure GEMINI_API_KEY (Vercel) / GEMINI_API_KEY (local) puis rebuild.");
   }
 
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const model = (process.env.GEMINI_MODEL || 'gemini-2.0-flash').trim();
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  const model = (process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp').trim();
 
   // Convert file to base64
   const base64Data = await new Promise<string>((resolve, reject) => {
