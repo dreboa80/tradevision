@@ -1,0 +1,5 @@
+{
+  "name": "TradeVision",
+  "description": "Institutional-grade market analysis engine powered by Gemini AI. Upload chart screenshots for instant structural and liquidity analysis.",
+  "requestFramePermissions": []
+}
