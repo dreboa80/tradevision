@@ -152,13 +152,6 @@ const App: React.FC = () => {
     setError(null);
   };
 
-  const cancelSubscription = () => {
-      // Dev utility to reset state for testing
-      localStorage.removeItem('subscription_status');
-      setSubscription(null);
-      setIsExpired(false);
-  }
-
   return (
     <div className="min-h-screen bg-institutional-bg text-institutional-text font-sans selection:bg-institutional-accent selection:text-black">
       <Header lang={lang} />
@@ -188,9 +181,6 @@ const App: React.FC = () => {
                                  Days left: {Math.max(0, 30 - Math.floor((Date.now() - subscription.startDate) / (1000 * 60 * 60 * 24)))}
                              </span>
                          )}
-                         <button onClick={cancelSubscription} className="text-[10px] underline text-institutional-muted hover:text-white">
-                             Reset Plan (Dev)
-                         </button>
                     </div>
 
                     <div 
