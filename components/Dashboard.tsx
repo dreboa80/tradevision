@@ -15,18 +15,34 @@ const Dashboard: React.FC<DashboardProps> = ({ data, lang }) => {
   const t = translations[lang];
   const isBuy = data.market_bias.direction === 'BUY';
   const isSell = data.market_bias.direction === 'SELL';
+  const isLowConfidence = data.market_bias.confidence < 65;
   
-  const biasColor = isBuy 
-    ? 'text-emerald-400' 
-    : isSell 
-      ? 'text-rose-400' 
-      : 'text-amber-400';
+  const biasColor = isLowConfidence 
+    ? 'text-amber-400'
+    : isBuy 
+      ? 'text-emerald-400' 
+      : isSell 
+        ? 'text-rose-400' 
+        : 'text-amber-400';
 
   const BiasIcon = isBuy ? IconTrendingUp : isSell ? IconTrendingDown : IconNeutral;
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 animate-in slide-in-from-bottom-4 duration-700">
       
+      {/* Safety Warning for Low Confidence */}
+      {isLowConfidence && (
+          <div className="bg-amber-950/20 border border-amber-500/30 rounded-xl p-4 flex items-center gap-4 animate-pulse">
+              <div className="p-2 bg-amber-500/20 rounded text-amber-500">
+                  <IconAlert size={24} />
+              </div>
+              <div>
+                  <h4 className="text-sm font-bold text-amber-400 uppercase tracking-wider">{t.low_confidence_title}</h4>
+                  <p className="text-xs text-amber-200/70">{t.low_confidence_desc}</p>
+              </div>
+          </div>
+      )}
+
       {/* Top Bar: Asset & Bias & Confidence */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-institutional-card border border-institutional-border rounded-xl p-6 flex flex-col justify-center shadow-lg">
@@ -53,10 +69,10 @@ const Dashboard: React.FC<DashboardProps> = ({ data, lang }) => {
         <div className="bg-institutional-card border border-institutional-border rounded-xl p-6 flex flex-col justify-center shadow-lg relative overflow-hidden">
             <div className="text-[10px] font-mono text-institutional-muted uppercase tracking-[0.2em] mb-2">{t.confidence}</div>
             <div className="flex items-end gap-2">
-                <div className="text-4xl font-mono font-bold text-white leading-none">{data.market_bias.confidence}%</div>
+                <div className={`text-4xl font-mono font-bold leading-none ${isLowConfidence ? 'text-amber-400' : 'text-white'}`}>{data.market_bias.confidence}%</div>
                 <div className="flex gap-1 mb-1">
                     {[1,2,3,4,5].map(i => (
-                        <div key={i} className={`w-1.5 h-4 rounded-full ${i * 20 <= data.market_bias.confidence ? 'bg-institutional-accent' : 'bg-institutional-border'}`}></div>
+                        <div key={i} className={`w-1.5 h-4 rounded-full ${i * 20 <= data.market_bias.confidence ? (isLowConfidence ? 'bg-amber-500' : 'bg-institutional-accent') : 'bg-institutional-border'}`}></div>
                     ))}
                 </div>
             </div>
