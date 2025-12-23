@@ -1,10 +1,10 @@
-
 import { GoogleGenAI } from "@google/genai";
 import { getTradingAnalysisPrompt } from '../constants';
 import { AnalysisResponse } from '../types';
 import { Language } from '../i18n';
 
 export const analyzeChart = async (file: File, lang: Language): Promise<AnalysisResponse> => {
+  // CRITICAL: Utilisation de la clé API correcte selon les directives
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
   const base64Data = await new Promise<string>((resolve, reject) => {
@@ -20,7 +20,7 @@ export const analyzeChart = async (file: File, lang: Language): Promise<Analysis
 
   const mimeType = file.type;
   
-  // Capturer l'heure exacte de l'appareil de l'utilisateur
+  // Formatage précis de la date de l'utilisateur pour le prompt
   const now = new Date();
   const currentTimeStr = now.toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-US', {
     year: 'numeric',
@@ -29,22 +29,22 @@ export const analyzeChart = async (file: File, lang: Language): Promise<Analysis
     hour: '2-digit',
     minute: '2-digit',
     hour12: false
-  });
+  }).replace(',', '');
 
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-pro-preview',
       contents: {
         parts: [
-            {
-                text: getTradingAnalysisPrompt(lang, currentTimeStr)
-            },
-            {
-                inlineData: {
-                    mimeType: mimeType,
-                    data: base64Data
-                }
+          {
+            text: getTradingAnalysisPrompt(lang, currentTimeStr)
+          },
+          {
+            inlineData: {
+              mimeType: mimeType,
+              data: base64Data
             }
+          }
         ]
       },
       config: {
@@ -56,7 +56,7 @@ export const analyzeChart = async (file: File, lang: Language): Promise<Analysis
     const text = response.text;
     
     if (!text) {
-        throw new Error("No response text from Gemini.");
+      throw new Error("No response text from Gemini.");
     }
 
     let cleanText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
@@ -64,15 +64,14 @@ export const analyzeChart = async (file: File, lang: Language): Promise<Analysis
     const lastBrace = cleanText.lastIndexOf('}');
     
     if (firstBrace !== -1 && lastBrace !== -1) {
-        cleanText = cleanText.substring(firstBrace, lastBrace + 1);
+      cleanText = cleanText.substring(firstBrace, lastBrace + 1);
     }
 
     try {
-        const jsonResponse = JSON.parse(cleanText) as AnalysisResponse;
-        return jsonResponse;
+      return JSON.parse(cleanText) as AnalysisResponse;
     } catch (parseError) {
-        console.error("Failed to parse JSON:", cleanText);
-        throw new Error("Failed to parse analysis results.");
+      console.error("JSON Parsing Error. Raw text:", cleanText);
+      throw new Error("Failed to parse analysis results.");
     }
 
   } catch (error: any) {
