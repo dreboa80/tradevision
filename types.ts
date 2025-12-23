@@ -1,4 +1,3 @@
-
 export interface MarketBias {
   direction: 'BUY' | 'SELL' | 'NEUTRAL';
   confidence: number;
