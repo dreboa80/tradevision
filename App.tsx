@@ -161,7 +161,6 @@ const App: React.FC = () => {
     setActiveView('vision');
   };
 
-  // Render the main app interface
   return (
     <div className="min-h-screen bg-[#0a0a0c] text-institutional-text font-sans selection:bg-institutional-accent selection:text-black">
       {!subscription || isExpired ? (
@@ -181,10 +180,32 @@ const App: React.FC = () => {
           <main className="pt-24 pb-12 px-4">
             {activeView === 'vision' ? (
               <div className="max-w-7xl mx-auto space-y-8">
+                
+                {/* ACTION BAR AT THE TOP WHEN RESULT IS ACTIVE */}
+                {result && !isAnalyzing && (
+                  <div className="max-w-7xl mx-auto flex justify-between items-center mb-2 px-2">
+                    <button 
+                      onClick={reset} 
+                      className="group flex items-center gap-3 px-4 py-2 rounded-xl border border-institutional-border bg-institutional-card/50 hover:border-institutional-accent/50 hover:bg-institutional-accent/5 transition-all duration-300"
+                    >
+                      <div className="w-6 h-6 rounded-lg bg-institutional-bg flex items-center justify-center text-institutional-accent group-hover:scale-110 transition-transform">
+                        <span className="text-lg">←</span>
+                      </div>
+                      <span className="text-[10px] font-mono font-bold text-institutional-muted group-hover:text-white uppercase tracking-widest">
+                        {t.new_analysis}
+                      </span>
+                    </button>
+                    <div className="hidden sm:flex items-center gap-3 text-[9px] font-mono text-institutional-muted uppercase tracking-widest">
+                       <span className="w-1.5 h-1.5 rounded-full bg-institutional-accent animate-pulse"></span>
+                       LIVE ANALYSIS COMPLETED
+                    </div>
+                  </div>
+                )}
+
                 {!result && !isAnalyzing && (
-                  <div className="max-w-xl mx-auto">
+                  <div className="max-w-xl mx-auto pt-12">
                     <div 
-                      className="border-2 border-dashed border-institutional-border rounded-2xl p-12 text-center hover:border-institutional-accent transition-colors cursor-pointer group bg-institutional-card/30"
+                      className="border-2 border-dashed border-institutional-border rounded-3xl p-16 text-center hover:border-institutional-accent transition-all cursor-pointer group bg-institutional-card/20 shadow-2xl"
                       onClick={() => fileInputRef.current?.click()}
                     >
                       <input 
@@ -194,31 +215,32 @@ const App: React.FC = () => {
                         className="hidden" 
                         accept="image/*"
                       />
-                      <div className="w-16 h-16 bg-institutional-accent/10 rounded-full flex items-center justify-center mx-auto mb-6 text-institutional-accent group-hover:scale-110 transition-transform">
+                      <div className="w-20 h-20 bg-institutional-bg border border-institutional-border rounded-2xl flex items-center justify-center mx-auto mb-8 text-institutional-muted group-hover:text-institutional-accent group-hover:border-institutional-accent/50 group-hover:scale-110 transition-all duration-500">
                         <IconUpload size={32} />
                       </div>
-                      <h2 className="text-xl font-bold text-white mb-2">{t.upload_title}</h2>
-                      <p className="text-institutional-muted text-sm">{t.upload_desc}</p>
-                      <p className="text-[10px] text-institutional-muted/50 mt-4 uppercase tracking-widest">{t.supports}</p>
+                      <h2 className="text-2xl font-bold text-white mb-3 tracking-tight">{t.upload_title}</h2>
+                      <p className="text-institutional-muted text-sm font-mono max-w-xs mx-auto leading-relaxed">{t.upload_desc}</p>
+                      <div className="mt-8 pt-8 border-t border-institutional-border/50">
+                         <p className="text-[10px] text-institutional-muted/50 uppercase tracking-[0.2em] font-mono">{t.supports}</p>
+                      </div>
                     </div>
 
                     {previewUrl && (
-                      <div className="mt-8 space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
-                        <div className="relative rounded-xl overflow-hidden border border-institutional-border aspect-video bg-black">
-                          <img src={previewUrl} alt="Preview" className="w-full h-full object-contain" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div>
+                      <div className="mt-10 space-y-8 animate-in fade-in slide-in-from-top-6 duration-700">
+                        <div className="relative rounded-2xl overflow-hidden border border-institutional-border aspect-video bg-black shadow-2xl">
+                          <img src={previewUrl} alt="Preview" className="w-full h-full object-contain p-2" />
                         </div>
                         <div className="flex gap-4">
                           <button 
                             onClick={triggerAnalysis}
-                            className="flex-1 py-4 rounded-xl bg-institutional-accent text-black font-bold text-sm tracking-widest hover:bg-emerald-400 transition-all flex items-center justify-center gap-3 shadow-[0_0_30px_rgba(0,220,130,0.2)]"
+                            className="flex-1 py-5 rounded-2xl bg-institutional-accent text-black font-black text-xs tracking-[0.2em] hover:bg-emerald-400 transition-all flex items-center justify-center gap-3 shadow-[0_0_50px_rgba(0,220,130,0.3)] hover:scale-[1.02] active:scale-95"
                           >
                             <IconScan size={20} />
-                            {t.run_engine}
+                            {t.run_engine.toUpperCase()}
                           </button>
                           <button 
                             onClick={reset}
-                            className="px-6 py-4 rounded-xl border border-institutional-border text-institutional-muted font-bold text-sm hover:text-white hover:bg-institutional-border/50 transition-all"
+                            className="px-8 py-5 rounded-2xl border border-institutional-border text-institutional-muted font-bold text-xs tracking-widest hover:text-white hover:bg-institutional-border/50 transition-all uppercase"
                           >
                             {t.cancel}
                           </button>
@@ -227,9 +249,9 @@ const App: React.FC = () => {
                     )}
 
                     {error && (
-                      <div className="mt-6 p-4 bg-rose-950/20 border border-rose-500/30 rounded-xl flex items-center gap-4 text-rose-400">
+                      <div className="mt-8 p-5 bg-rose-950/20 border border-rose-500/30 rounded-2xl flex items-center gap-4 text-rose-400 animate-in shake duration-500">
                         <IconAlert size={20} />
-                        <p className="text-sm font-mono">{error}</p>
+                        <p className="text-sm font-mono leading-relaxed">{error}</p>
                       </div>
                     )}
                   </div>
@@ -247,14 +269,13 @@ const App: React.FC = () => {
 
                 {/* History Section */}
                 {!isAnalyzing && (
-                  <div className="max-w-4xl mx-auto pt-12 border-t border-institutional-border/30">
-                    <div className="flex items-center justify-between mb-8">
-                       <h3 className="text-xs font-mono font-bold text-institutional-muted uppercase tracking-[0.3em]">{t.history_title}</h3>
-                       {result && (
-                         <button onClick={reset} className="text-[10px] font-mono text-institutional-accent hover:underline uppercase tracking-widest">
-                           + {t.new_analysis}
-                         </button>
-                       )}
+                  <div className="max-w-4xl mx-auto pt-20 pb-12">
+                    <div className="flex items-center gap-4 mb-10">
+                       <div className="p-2 bg-institutional-card border border-institutional-border rounded-lg">
+                          <IconScan className="text-institutional-accent" size={18} />
+                       </div>
+                       <h3 className="text-xs font-mono font-bold text-white uppercase tracking-[0.4em]">{t.history_title}</h3>
+                       <div className="h-px bg-institutional-border flex-grow"></div>
                     </div>
                     <HistoryList 
                       history={history} 
