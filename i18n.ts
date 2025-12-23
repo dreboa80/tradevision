@@ -1,3 +1,4 @@
+
 export type Language = 'en' | 'fr';
 
 export const getBrowserLanguage = (): Language => {
@@ -35,8 +36,10 @@ export const translations = {
     setup_invalidation: "SETUP INVALIDATION",
     limitations: "System Limitations",
     execution_setups: "EXECUTION SETUPS",
-    setup_primary: "SETUP A (PRIMARY)",
-    setup_confirmation: "SETUP B (CONFIRMATION)",
+    setup_primary: "SETUP A",
+    setup_confirmation: "SETUP B",
+    risk_aggressive: "AGGRESSIVE",
+    risk_conservative: "CONSERVATIVE",
     history_title: "SIGNAL HISTORY",
     no_history: "No previous signals recorded.",
     entry: "ENTRY",
@@ -103,8 +106,10 @@ export const translations = {
     setup_invalidation: "INVALIDATION DU SETUP",
     limitations: "Limitations du Système",
     execution_setups: "SETUPS D'EXÉCUTION",
-    setup_primary: "SETUP A (PRIMAIRE)",
-    setup_confirmation: "SETUP B (CONFIRMATION)",
+    setup_primary: "SETUP A",
+    setup_confirmation: "SETUP B",
+    risk_aggressive: "AGRESSIF",
+    risk_conservative: "CONSERVATEUR",
     history_title: "HISTORIQUE DES SIGNAUX",
     no_history: "Aucun signal précédent enregistré.",
     entry: "ENTRÉE",
