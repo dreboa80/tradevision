@@ -49,6 +49,12 @@ export const translations = {
     table_price: "Price",
     table_str: "Str",
     table_reason: "Reason",
+    // Result Tracking
+    track_result: "TRACK RESULT",
+    res_win: "WIN",
+    res_loss: "LOSS",
+    res_be: "B.E",
+    res_pending: "PENDING",
     // Safety
     low_confidence_title: "CAUTION: LOW PROBABILITY",
     low_confidence_desc: "The current structure lacks institutional clarity. Standing aside is recommended.",
@@ -127,6 +133,12 @@ export const translations = {
     table_price: "Prix",
     table_str: "Force",
     table_reason: "Raison",
+    // Result Tracking
+    track_result: "RÉSULTAT",
+    res_win: "WIN",
+    res_loss: "LOSS",
+    res_be: "B.E",
+    res_pending: "PANDING",
     // Safety
     low_confidence_title: "PRUDENCE : FAIBLE PROBABILITÉ",
     low_confidence_desc: "La structure actuelle manque de clarté institutionnelle. Il est recommandé de rester à l'écart.",
@@ -152,7 +164,7 @@ export const translations = {
     plan_expired: "VOTRE PLAN A EXPIRÉ",
     plan_expired_desc: "Veuillez passer au plan Gold pour continuer.",
     // Payment Verification
-    verify_title: "DEMANDE D'ACTIVATION",
+    verify_title: "DEMANDE d'ACTIVATION",
     verify_desc: "Pour garantir l'anonymat Zero-Knowledge, nous vérifions manuellement.",
     verify_step_1: "1. Envoyez votre ID de Transaction PayPal à :",
     verify_email: "marcel@moneyspaces.xyz",
