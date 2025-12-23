@@ -49,6 +49,11 @@ export const translations = {
     table_price: "Price",
     table_str: "Str",
     table_reason: "Reason",
+    // Safety
+    low_confidence_title: "CAUTION: LOW PROBABILITY",
+    low_confidence_desc: "The current structure lacks institutional clarity. Standing aside is recommended.",
+    low_prob_badge: "LOW PROB",
+    high_prob_badge: "HIGH PROB",
     // Pricing
     pricing_title: "SELECT ACCESS LEVEL",
     plan_silver: "SILVER",
@@ -82,7 +87,7 @@ export const translations = {
     header_subtitle: "Moteur de Vision Zero-Knowledge",
     system_online: "SYSTÈME EN LIGNE",
     upload_title: "Charger un Graphique",
-    upload_desc: "Glissez-déposez ou cliquez pour sélectionner",
+    upload_desc: "Glissez-deposez ou cliquez pour sélectionner",
     supports: "COMPATIBLE: PNG, JPG, WEBP",
     powered_by: "Propulsé par",
     ready_to_analyze: "Prêt pour l'analyse",
@@ -119,6 +124,11 @@ export const translations = {
     table_price: "Prix",
     table_str: "Force",
     table_reason: "Raison",
+    // Safety
+    low_confidence_title: "PRUDENCE : FAIBLE PROBABILITÉ",
+    low_confidence_desc: "La structure actuelle manque de clarté institutionnelle. Il est recommandé de rester à l'écart.",
+    low_prob_badge: "FIAB. BASSE",
+    high_prob_badge: "FIAB. HAUTE",
     // Pricing
     pricing_title: "NIVEAU D'ACCÈS",
     plan_silver: "SILVER",
