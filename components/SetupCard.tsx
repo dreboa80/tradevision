@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Setup } from '../types';
+import { Setup, SetupResult } from '../types';
 import { IconTarget, IconShield, IconArrowRight, IconAlert, IconCheck } from './Icons';
 import { Language, translations } from '../i18n';
 
@@ -9,22 +9,33 @@ interface SetupCardProps {
   setup: Setup;
   bias: 'BUY' | 'SELL' | 'NEUTRAL';
   lang: Language;
+  onUpdateResult?: (result: SetupResult) => void;
 }
 
-const SetupCard: React.FC<SetupCardProps> = ({ title, setup, bias, lang }) => {
+const SetupCard: React.FC<SetupCardProps> = ({ title, setup, bias, lang, onUpdateResult }) => {
   const t = translations[lang];
   const [isRevealed, setIsRevealed] = useState(setup.reliability >= 65);
   
   const isBuy = bias === 'BUY';
   const isAggressive = setup.risk_profile === 'aggressive';
   const isLowReliability = setup.reliability < 65;
+  const currentResult = setup.user_result || 'PENDING';
   
   const accentColor = isLowReliability && !isRevealed ? 'text-amber-400' : (isBuy ? 'text-emerald-400' : 'text-rose-400');
   const borderColor = isLowReliability && !isRevealed ? 'border-amber-500/20' : (isBuy ? 'border-emerald-500/20' : 'border-rose-500/20');
   const bgGradient = isLowReliability && !isRevealed ? 'from-amber-950/10' : (isBuy ? 'from-emerald-950/20' : 'from-rose-950/20');
 
+  const getResultStyle = (res: SetupResult) => {
+    switch(res) {
+      case 'WIN': return 'bg-emerald-500 text-black shadow-[0_0_15px_rgba(16,185,129,0.3)]';
+      case 'LOSS': return 'bg-rose-500 text-white shadow-[0_0_15px_rgba(244,63,94,0.3)]';
+      case 'BE': return 'bg-institutional-muted text-black';
+      default: return 'bg-institutional-bg border border-institutional-border text-institutional-muted';
+    }
+  };
+
   return (
-    <div className={`border ${borderColor} bg-gradient-to-b ${bgGradient} to-institutional-card rounded-lg p-5 flex flex-col h-full relative overflow-hidden group shadow-xl transition-all`}>
+    <div className={`border ${borderColor} bg-gradient-to-b ${bgGradient} to-institutional-card rounded-lg p-5 flex flex-col h-full relative overflow-hidden group shadow-xl transition-all duration-500 ${currentResult === 'WIN' ? 'ring-1 ring-emerald-500/50' : currentResult === 'LOSS' ? 'ring-1 ring-rose-500/50' : ''}`}>
       <div className={`absolute top-0 left-0 w-1 h-full ${isLowReliability ? 'bg-amber-500' : (isBuy ? 'bg-emerald-500' : 'bg-rose-500')}`}></div>
       
       {/* Header Info */}
@@ -68,7 +79,7 @@ const SetupCard: React.FC<SetupCardProps> = ({ title, setup, bias, lang }) => {
             {['tp1', 'tp2', 'tp3'].map((tp, i) => (
                 <div key={tp} className="p-2 bg-institutional-bg/30 rounded border border-institutional-border/50 text-center">
                     <span className="block text-[9px] text-institutional-muted mb-1 uppercase tracking-tighter">Target {i+1}</span>
-                    <span className={`block font-bold ${accentColor}`}>{setup[tp as keyof Setup]}</span>
+                    <span className={`block font-bold ${accentColor}`}>{setup[tp as keyof Setup] as string}</span>
                 </div>
             ))}
         </div>
@@ -89,9 +100,32 @@ const SetupCard: React.FC<SetupCardProps> = ({ title, setup, bias, lang }) => {
         </div>
       </div>
 
+      {/* Result Tracker (unblurred) */}
+      <div className="mt-4 pt-3 border-t border-institutional-border/30 flex flex-col gap-2 relative z-30">
+        <div className="flex items-center justify-between">
+            <span className="text-[9px] font-mono text-institutional-muted uppercase tracking-widest">{t.track_result}</span>
+            {currentResult !== 'PENDING' && <IconCheck size={12} className="text-institutional-accent" />}
+        </div>
+        <div className="flex gap-1">
+            {(['WIN', 'LOSS', 'BE', 'PENDING'] as SetupResult[]).map((res) => (
+                <button
+                    key={res}
+                    onClick={() => onUpdateResult?.(res)}
+                    className={`flex-1 py-1 rounded text-[9px] font-bold transition-all ${
+                        currentResult === res 
+                        ? getResultStyle(res) 
+                        : 'bg-institutional-bg border border-institutional-border text-institutional-muted hover:border-institutional-muted/50'
+                    }`}
+                >
+                    {t[`res_${res.toLowerCase() as 'win' | 'loss' | 'be' | 'pending'}`]}
+                </button>
+            ))}
+        </div>
+      </div>
+
       {/* Reveal Overlay */}
       {isLowReliability && !isRevealed && (
-          <div className="absolute inset-x-5 bottom-8 top-16 flex flex-col items-center justify-center text-center space-y-4 z-20">
+          <div className="absolute inset-x-5 bottom-20 top-16 flex flex-col items-center justify-center text-center space-y-4 z-20">
               <div className="p-3 bg-amber-500/20 rounded-full text-amber-500">
                   <IconAlert size={24} />
               </div>
