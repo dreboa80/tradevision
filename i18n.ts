@@ -51,6 +51,7 @@ export const translations = {
     table_price: "Price",
     table_str: "Str",
     table_reason: "Reason",
+    expires_at: "EXPIRES AT",
     // Result Tracking
     track_result: "TRACK RESULT",
     res_win: "WIN",
@@ -145,6 +146,7 @@ export const translations = {
     table_price: "Prix",
     table_str: "Force",
     table_reason: "Raison",
+    expires_at: "EXPIRE LE",
     // Result Tracking
     track_result: "RÉSULTAT",
     res_win: "WIN",
@@ -168,7 +170,7 @@ export const translations = {
     reveal_anyway_desc: "Faible fiabilité mais RR potentiel élevé. Vérification manuelle requise.",
     btn_reveal_setup: "RÉVÉLER LES DONNÉES",
     // Pricing
-    pricing_title: "NIVEAU D'ACCÈS",
+    pricing_title: "NIVEAU d'ACCÈS",
     plan_silver: "SILVER",
     plan_gold: "GOLD",
     silver_price: "GRATUIT",
