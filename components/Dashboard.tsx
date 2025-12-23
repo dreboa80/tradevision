@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { AnalysisResponse } from '../types';
 import SetupCard from './SetupCard';
 import LiquidityTable from './LiquidityTable';
-import { IconTrendingUp, IconTrendingDown, IconNeutral, IconBrain, IconAlert } from './Icons';
+import { IconTrendingUp, IconTrendingDown, IconNeutral, IconBrain, IconAlert, IconTarget, IconScan } from './Icons';
 import { Language, translations } from '../i18n';
 
 interface DashboardProps {
@@ -26,24 +27,38 @@ const Dashboard: React.FC<DashboardProps> = ({ data, lang }) => {
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 animate-in slide-in-from-bottom-4 duration-700">
       
-      {/* Top Bar: Asset & Bias */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-institutional-card border border-institutional-border rounded-lg p-6 flex flex-col justify-center">
-          <div className="text-xs font-mono text-institutional-muted uppercase tracking-wider mb-2">{t.asset_class}</div>
-          <div className="text-3xl font-bold text-white tracking-tight">{data.asset_class}</div>
+      {/* Top Bar: Asset & Bias & Confidence */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-institutional-card border border-institutional-border rounded-xl p-6 flex flex-col justify-center shadow-lg">
+          <div className="text-[10px] font-mono text-institutional-muted uppercase tracking-[0.2em] mb-2">{t.asset_class}</div>
+          <div className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
+            <div className="w-2 h-8 bg-institutional-accent rounded-full"></div>
+            {data.asset_class}
+          </div>
         </div>
 
-        <div className="bg-institutional-card border border-institutional-border rounded-lg p-6 flex items-center justify-between">
-            <div>
-                 <div className="text-xs font-mono text-institutional-muted uppercase tracking-wider mb-2">{t.market_bias}</div>
+        <div className="bg-institutional-card border border-institutional-border rounded-xl p-6 flex items-center justify-between shadow-lg relative overflow-hidden">
+            {/* Subtle background icon */}
+            <BiasIcon className={`absolute -right-4 -bottom-4 opacity-5 ${biasColor}`} size={120} />
+            
+            <div className="relative z-10">
+                 <div className="text-[10px] font-mono text-institutional-muted uppercase tracking-[0.2em] mb-2">{t.market_bias}</div>
                  <div className={`text-3xl font-bold ${biasColor} flex items-center gap-3`}>
                     <BiasIcon size={32} />
                     {data.market_bias.direction}
                 </div>
             </div>
-            <div className="text-right">
-                <div className="text-xs font-mono text-institutional-muted uppercase tracking-wider mb-1">{t.confidence}</div>
-                <div className="text-2xl font-mono font-bold text-white">{data.market_bias.confidence}%</div>
+        </div>
+
+        <div className="bg-institutional-card border border-institutional-border rounded-xl p-6 flex flex-col justify-center shadow-lg relative overflow-hidden">
+            <div className="text-[10px] font-mono text-institutional-muted uppercase tracking-[0.2em] mb-2">{t.confidence}</div>
+            <div className="flex items-end gap-2">
+                <div className="text-4xl font-mono font-bold text-white leading-none">{data.market_bias.confidence}%</div>
+                <div className="flex gap-1 mb-1">
+                    {[1,2,3,4,5].map(i => (
+                        <div key={i} className={`w-1.5 h-4 rounded-full ${i * 20 <= data.market_bias.confidence ? 'bg-institutional-accent' : 'bg-institutional-border'}`}></div>
+                    ))}
+                </div>
             </div>
         </div>
       </div>
@@ -52,31 +67,47 @@ const Dashboard: React.FC<DashboardProps> = ({ data, lang }) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Left Column: Liquidity Zones */}
-        <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center space-x-2 mb-2">
-            <h2 className="text-lg font-bold text-white tracking-tight">{t.liquidity_map}</h2>
+        <div className="lg:col-span-2 space-y-6">
+          <div className="flex items-center space-x-4 mb-2">
+            <div className="p-2 bg-institutional-accent/10 rounded border border-institutional-accent/20">
+                <IconTarget className="text-institutional-accent" size={18} />
+            </div>
+            <h2 className="text-xl font-bold text-white tracking-tight">{t.liquidity_map}</h2>
             <div className="h-px bg-institutional-border flex-grow"></div>
           </div>
+          
           <LiquidityTable zones={data.liquidity_zones} lang={lang} />
           
            {/* Institutional Logic Box */}
-            <div className="mt-8">
-                 <div className="flex items-center space-x-2 mb-4 mt-8">
-                    <IconBrain className="text-institutional-accent" size={20} />
-                    <h2 className="text-lg font-bold text-white tracking-tight">{t.institutional_reading}</h2>
+            <div className="pt-4">
+                 <div className="flex items-center space-x-4 mb-6">
+                    <div className="p-2 bg-purple-500/10 rounded border border-purple-500/20">
+                        <IconBrain className="text-purple-400" size={18} />
+                    </div>
+                    <h2 className="text-xl font-bold text-white tracking-tight">{t.institutional_reading}</h2>
+                    <div className="h-px bg-institutional-border flex-grow"></div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-institutional-bg border border-institutional-border p-4 rounded-lg">
-                        <h4 className="text-xs font-mono text-institutional-muted uppercase mb-2">{t.market_intent}</h4>
-                        <p className="text-sm text-institutional-text leading-relaxed">{data.institutional_reading.market_intent}</p>
+                    <div className="bg-institutional-card border border-institutional-border p-5 rounded-xl hover:border-institutional-accent/30 transition-colors">
+                        <h4 className="text-[10px] font-mono text-institutional-muted uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+                            {t.market_intent}
+                        </h4>
+                        <p className="text-sm text-institutional-text leading-relaxed font-sans">{data.institutional_reading.market_intent}</p>
                     </div>
-                    <div className="bg-institutional-bg border border-institutional-border p-4 rounded-lg">
-                        <h4 className="text-xs font-mono text-institutional-muted uppercase mb-2">{t.retail_traps}</h4>
-                        <p className="text-sm text-institutional-text leading-relaxed">{data.institutional_reading.retail_traps}</p>
+                    <div className="bg-institutional-card border border-institutional-border p-5 rounded-xl hover:border-institutional-accent/30 transition-colors">
+                        <h4 className="text-[10px] font-mono text-institutional-muted uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                            {t.retail_traps}
+                        </h4>
+                        <p className="text-sm text-institutional-text leading-relaxed font-sans">{data.institutional_reading.retail_traps}</p>
                     </div>
-                     <div className="bg-institutional-bg border border-institutional-border p-4 rounded-lg">
-                        <h4 className="text-xs font-mono text-institutional-muted uppercase mb-2">{t.objective}</h4>
-                        <p className="text-sm text-institutional-text leading-relaxed">{data.institutional_reading.liquidity_objective}</p>
+                     <div className="bg-institutional-card border border-institutional-border p-5 rounded-xl hover:border-institutional-accent/30 transition-colors">
+                        <h4 className="text-[10px] font-mono text-institutional-muted uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                            {t.objective}
+                        </h4>
+                        <p className="text-sm text-institutional-text leading-relaxed font-sans">{data.institutional_reading.liquidity_objective}</p>
                     </div>
                 </div>
             </div>
@@ -84,29 +115,35 @@ const Dashboard: React.FC<DashboardProps> = ({ data, lang }) => {
 
         {/* Right Column: Invalidation & Limitations */}
         <div className="space-y-6">
-           <div className="bg-rose-950/10 border border-rose-900/30 rounded-lg p-5">
-                <div className="flex items-center space-x-2 mb-3 text-rose-400">
-                    <IconAlert size={18} />
-                    <h3 className="font-bold text-sm uppercase tracking-wider">{t.invalidation_rules}</h3>
+           <div className="bg-rose-950/10 border border-rose-900/30 rounded-xl p-6 shadow-lg">
+                <div className="flex items-center space-x-3 mb-5 text-rose-400">
+                    <IconAlert size={20} />
+                    <h3 className="font-bold text-sm uppercase tracking-[0.15em]">{t.invalidation_rules}</h3>
                 </div>
-                <div className="space-y-4 text-sm font-mono">
-                    <div>
-                        <span className="text-rose-300 block mb-1 text-xs">{t.bias_invalidation}</span>
-                        <p className="text-institutional-text/80">{data.invalidation_rules.bias_invalidation}</p>
+                <div className="space-y-6 text-sm font-mono">
+                    <div className="relative pl-4 border-l border-rose-900/50">
+                        <span className="text-rose-400/70 block mb-2 text-[10px] uppercase tracking-widest">{t.bias_invalidation}</span>
+                        <p className="text-institutional-text/90 leading-relaxed italic">"{data.invalidation_rules.bias_invalidation}"</p>
                     </div>
-                     <div>
-                        <span className="text-rose-300 block mb-1 text-xs">{t.setup_invalidation}</span>
-                        <p className="text-institutional-text/80">{data.invalidation_rules.setup_invalidation}</p>
+                     <div className="relative pl-4 border-l border-rose-900/50">
+                        <span className="text-rose-400/70 block mb-2 text-[10px] uppercase tracking-widest">{t.setup_invalidation}</span>
+                        <p className="text-institutional-text/90 leading-relaxed italic">"{data.invalidation_rules.setup_invalidation}"</p>
                     </div>
                 </div>
            </div>
 
            {data.limitations && data.limitations.length > 0 && (
-               <div className="border border-institutional-border bg-institutional-bg p-4 rounded-lg">
-                    <h4 className="text-xs font-mono text-institutional-muted uppercase mb-2">{t.limitations}</h4>
-                    <ul className="list-disc list-inside text-xs text-institutional-muted space-y-1">
+               <div className="border border-institutional-border bg-institutional-bg/50 p-5 rounded-xl">
+                    <h4 className="text-[10px] font-mono text-institutional-muted uppercase tracking-widest mb-3 flex items-center gap-2">
+                        <IconScan size={14} />
+                        {t.limitations}
+                    </h4>
+                    <ul className="space-y-2">
                         {data.limitations.map((limit, i) => (
-                            <li key={i}>{limit}</li>
+                            <li key={i} className="text-[11px] text-institutional-muted flex items-start gap-2">
+                                <span className="text-institutional-accent mt-0.5">•</span>
+                                {limit}
+                            </li>
                         ))}
                     </ul>
                </div>
@@ -115,9 +152,12 @@ const Dashboard: React.FC<DashboardProps> = ({ data, lang }) => {
       </div>
 
       {/* Bottom Section: Setups */}
-      <div className="space-y-6">
-        <div className="flex items-center space-x-2 mb-4">
-            <h2 className="text-lg font-bold text-white tracking-tight">{t.execution_setups}</h2>
+      <div className="space-y-6 pt-8">
+        <div className="flex items-center space-x-4 mb-6">
+            <div className="p-2 bg-institutional-accent/10 rounded border border-institutional-accent/20">
+                <IconScan className="text-institutional-accent" size={18} />
+            </div>
+            <h2 className="text-xl font-bold text-white tracking-tight">{t.execution_setups}</h2>
             <div className="h-px bg-institutional-border flex-grow"></div>
         </div>
         
