@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { AnalysisResponse } from '../types';
+import { AnalysisResponse, SetupResult } from '../types';
 import SetupCard from './SetupCard';
 import LiquidityTable from './LiquidityTable';
 import { IconTrendingUp, IconTrendingDown, IconNeutral, IconBrain, IconAlert, IconTarget, IconScan } from './Icons';
@@ -9,9 +9,10 @@ import { Language, translations } from '../i18n';
 interface DashboardProps {
   data: AnalysisResponse;
   lang: Language;
+  onUpdateSetupResult?: (setupKey: 'setup_A' | 'setup_B', result: SetupResult) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ data, lang }) => {
+const Dashboard: React.FC<DashboardProps> = ({ data, lang, onUpdateSetupResult }) => {
   const t = translations[lang];
   const isBuy = data.market_bias.direction === 'BUY';
   const isSell = data.market_bias.direction === 'SELL';
@@ -54,9 +55,7 @@ const Dashboard: React.FC<DashboardProps> = ({ data, lang }) => {
         </div>
 
         <div className="bg-institutional-card border border-institutional-border rounded-xl p-6 flex items-center justify-between shadow-lg relative overflow-hidden">
-            {/* Subtle background icon */}
             <BiasIcon className={`absolute -right-4 -bottom-4 opacity-5 ${biasColor}`} size={120} />
-            
             <div className="relative z-10">
                  <div className="text-[10px] font-mono text-institutional-muted uppercase tracking-[0.2em] mb-2">{t.market_bias}</div>
                  <div className={`text-3xl font-bold ${biasColor} flex items-center gap-3`}>
@@ -79,10 +78,7 @@ const Dashboard: React.FC<DashboardProps> = ({ data, lang }) => {
         </div>
       </div>
 
-      {/* Main Grid: Liquidity & Institutional Reading */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Left Column: Liquidity Zones */}
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center space-x-4 mb-2">
             <div className="p-2 bg-institutional-accent/10 rounded border border-institutional-accent/20">
@@ -94,7 +90,6 @@ const Dashboard: React.FC<DashboardProps> = ({ data, lang }) => {
           
           <LiquidityTable zones={data.liquidity_zones} lang={lang} />
           
-           {/* Institutional Logic Box */}
             <div className="pt-4">
                  <div className="flex items-center space-x-4 mb-6">
                     <div className="p-2 bg-purple-500/10 rounded border border-purple-500/20">
@@ -129,7 +124,6 @@ const Dashboard: React.FC<DashboardProps> = ({ data, lang }) => {
             </div>
         </div>
 
-        {/* Right Column: Invalidation & Limitations */}
         <div className="space-y-6">
            <div className="bg-rose-950/10 border border-rose-900/30 rounded-xl p-6 shadow-lg">
                 <div className="flex items-center space-x-3 mb-5 text-rose-400">
@@ -167,7 +161,6 @@ const Dashboard: React.FC<DashboardProps> = ({ data, lang }) => {
         </div>
       </div>
 
-      {/* Bottom Section: Setups */}
       <div className="space-y-6 pt-8">
         <div className="flex items-center space-x-4 mb-6">
             <div className="p-2 bg-institutional-accent/10 rounded border border-institutional-accent/20">
@@ -183,12 +176,14 @@ const Dashboard: React.FC<DashboardProps> = ({ data, lang }) => {
                 setup={data.setups.setup_A} 
                 bias={data.market_bias.direction} 
                 lang={lang}
+                onUpdateResult={(res) => onUpdateSetupResult?.('setup_A', res)}
             />
             <SetupCard 
                 title={t.setup_confirmation} 
                 setup={data.setups.setup_B} 
                 bias={data.market_bias.direction}
                 lang={lang} 
+                onUpdateResult={(res) => onUpdateSetupResult?.('setup_B', res)}
             />
         </div>
       </div>
