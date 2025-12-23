@@ -139,11 +139,21 @@ Décris précisément :
 - ce que ferait un opérateur institutionnel dans ce cas (neutraliser, attendre reclaim, switch scenario, etc.)
 
 ---
+## LOGIQUE TEMPORELLE (CRUCIAL)
+L'heure actuelle de l'utilisateur est : **${currentTime}**.
+Toutes tes estimations d'expiration de setups DOIVENT se baser sur ce point de référence. Ne jamais inventer une date de départ différente.
 
-## FORMAT DE SORTIE (OBLIGATOIRE)
-- **AUCUN TEXTE** en dehors du JSON.
-- Utilise des **strings** pour les prix afin de conserver le formatage exact (ex: "1.0500").
+---
 
+## MÉTHODOLOGIE DE GÉNÉRATION DES SETUPS
+Pour chaque setup (A et B), tu dois impérativement définir une **date et heure d'expiration**.
+- Si le graphique suggère de l'intraday (scalping) : Expiration à +4h ou fin de session.
+- Si le graphique suggère du swing : Expiration à +24h ou +48h.
+- Format requis : "YYYY-MM-DD HH:mm".
+
+---
+
+## FORMAT DE SORTIE JSON
 \`\`\`json
 {
   "asset_class": "Forex | Crypto | Indices | Commodities | Stocks | Unknown",
@@ -174,6 +184,8 @@ Décris précisément :
       "tp2": "0.0000",
       "tp3": "0.0000",
       "reliability": 0,
+      "risk_reward": "1:X",
+      "expiry": "YYYY-MM-DD HH:mm",
       "logic": ""
     },
     "setup_B": {
@@ -185,6 +197,8 @@ Décris précisément :
       "tp2": "0.0000",
       "tp3": "0.0000",
       "reliability": 0,
+      "risk_reward": "1:X",
+      "expiry": "YYYY-MM-DD HH:mm",
       "logic": ""
     }
   },
@@ -192,9 +206,6 @@ Décris précisément :
     "bias_invalidation": "",
     "setup_invalidation": ""
   },
-  "limitations": [
-    "Any uncertainty due to image quality, scale, or missing data"
-  ]
+  "limitations": []
 }
 \`\`\`
-`;
