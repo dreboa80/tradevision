@@ -11,6 +11,8 @@ export const translations = {
   en: {
     header_subtitle: "Zero-Knowledge Vision Engine",
     system_online: "SYSTEM ONLINE",
+    nav_vision: "VISION",
+    nav_analytics: "ANALYTICS",
     upload_title: "Upload Chart",
     upload_desc: "Drag & drop or click to select a trading chart",
     supports: "SUPPORTS: PNG, JPG, WEBP",
@@ -55,6 +57,14 @@ export const translations = {
     res_loss: "LOSS",
     res_be: "B.E",
     res_pending: "PENDING",
+    // Analytics
+    analytics_title: "PERFORMANCE ANALYTICS",
+    analytics_desc: "Statistical breakdown of your confirmed setups.",
+    global_stats: "GLOBAL METRICS",
+    monthly_breakdown: "MONTHLY BREAKDOWN",
+    win_rate: "WIN RATE",
+    total_trades: "TOTAL TRADES",
+    no_data_analytics: "Mark results on your setups to see analytics.",
     // Safety
     low_confidence_title: "CAUTION: LOW PROBABILITY",
     low_confidence_desc: "The current structure lacks institutional clarity. Standing aside is recommended.",
@@ -95,6 +105,8 @@ export const translations = {
   fr: {
     header_subtitle: "Moteur de Vision Zero-Knowledge",
     system_online: "SYSTÈME EN LIGNE",
+    nav_vision: "VISION",
+    nav_analytics: "ANALYTICS",
     upload_title: "Charger un Graphique",
     upload_desc: "Glissez-deposez ou cliquez pour sélectionner",
     supports: "COMPATIBLE: PNG, JPG, WEBP",
@@ -138,7 +150,15 @@ export const translations = {
     res_win: "WIN",
     res_loss: "LOSS",
     res_be: "B.E",
-    res_pending: "PANDING",
+    res_pending: "PENDING",
+    // Analytics
+    analytics_title: "ANALYSE DES TRADES",
+    analytics_desc: "Répartition statistique de vos setups confirmés.",
+    global_stats: "MÉTRIQUES GLOBALES",
+    monthly_breakdown: "RÉPARTITION MENSUELLE",
+    win_rate: "WIN RATE",
+    total_trades: "TOTAL TRADES",
+    no_data_analytics: "Marquez des résultats sur vos setups pour voir les analyses.",
     // Safety
     low_confidence_title: "PRUDENCE : FAIBLE PROBABILITÉ",
     low_confidence_desc: "La structure actuelle manque de clarté institutionnelle. Il est recommandé de rester à l'écart.",
