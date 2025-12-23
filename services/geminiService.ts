@@ -5,10 +5,8 @@ import { AnalysisResponse } from '../types';
 import { Language } from '../i18n';
 
 export const analyzeChart = async (file: File, lang: Language): Promise<AnalysisResponse> => {
-  // L'API Key est gérée via process.env.API_KEY
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-  // Convert file to base64
   const base64Data = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -21,15 +19,25 @@ export const analyzeChart = async (file: File, lang: Language): Promise<Analysis
   });
 
   const mimeType = file.type;
+  
+  // Capturer l'heure exacte de l'appareil de l'utilisateur
+  const now = new Date();
+  const currentTimeStr = now.toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  });
 
   try {
-    // Utilisation de gemini-3-pro-preview pour une analyse de structure de marché supérieure
     const response = await ai.models.generateContent({
       model: 'gemini-3-pro-preview',
       contents: {
         parts: [
             {
-                text: getTradingAnalysisPrompt(lang)
+                text: getTradingAnalysisPrompt(lang, currentTimeStr)
             },
             {
                 inlineData: {
@@ -40,8 +48,8 @@ export const analyzeChart = async (file: File, lang: Language): Promise<Analysis
         ]
       },
       config: {
-        temperature: 0.1, // Réduit pour plus de rigueur analytique
-        thinkingConfig: { thinkingBudget: 4000 } // Permet au modèle de "réfléchir" à la structure avant de répondre
+        temperature: 0.1,
+        thinkingConfig: { thinkingBudget: 4000 }
       }
     });
 
@@ -64,7 +72,7 @@ export const analyzeChart = async (file: File, lang: Language): Promise<Analysis
         return jsonResponse;
     } catch (parseError) {
         console.error("Failed to parse JSON:", cleanText);
-        throw new Error("Failed to parse analysis results. The AI might have returned an invalid format.");
+        throw new Error("Failed to parse analysis results.");
     }
 
   } catch (error: any) {
