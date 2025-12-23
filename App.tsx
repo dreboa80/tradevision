@@ -33,14 +33,14 @@ const App: React.FC = () => {
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Check Subscription on Mount
+  // Load persistence on Mount
   useEffect(() => {
+    // 1. Subscription
     const storedSub = localStorage.getItem('subscription_status');
     if (storedSub) {
       const parsedSub: SubscriptionStatus = JSON.parse(storedSub);
       setSubscription(parsedSub);
 
-      // Check Expiry for Silver
       if (parsedSub.plan === 'silver') {
         const now = Date.now();
         const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
@@ -50,10 +50,8 @@ const App: React.FC = () => {
         }
       }
     }
-  }, []);
 
-  // Load History
-  useEffect(() => {
+    // 2. History
     const savedHistory = localStorage.getItem('trade_history');
     if (savedHistory) {
       try {
@@ -66,24 +64,15 @@ const App: React.FC = () => {
 
   const handleSelectPlan = (plan: PlanType) => {
     if (!plan) return;
-
-    if (plan === 'silver') {
-        const newSub: SubscriptionStatus = {
-            plan: 'silver',
-            startDate: Date.now()
-        };
-        localStorage.setItem('subscription_status', JSON.stringify(newSub));
-        setSubscription(newSub);
-    } else if (plan === 'gold') {
-        const newSub: SubscriptionStatus = {
-            plan: 'gold',
-            startDate: Date.now(),
-            expiryDate: Date.now() + (30 * 24 * 60 * 60 * 1000)
-        };
-        localStorage.setItem('subscription_status', JSON.stringify(newSub));
-        setSubscription(newSub);
-        setIsExpired(false);
-    }
+    const duration = 30 * 24 * 60 * 60 * 1000;
+    const newSub: SubscriptionStatus = {
+        plan,
+        startDate: Date.now(),
+        expiryDate: Date.now() + duration
+    };
+    localStorage.setItem('subscription_status', JSON.stringify(newSub));
+    setSubscription(newSub);
+    setIsExpired(false);
   };
 
   const saveToHistory = (analysis: AnalysisResponse) => {
@@ -92,8 +81,7 @@ const App: React.FC = () => {
       timestamp: Date.now(),
       data: analysis
     };
-    
-    const updatedHistory = [newItem, ...history].slice(0, 10);
+    const updatedHistory = [newItem, ...history].slice(0, 20); // Historique augmenté à 20 items
     setHistory(updatedHistory);
     localStorage.setItem('trade_history', JSON.stringify(updatedHistory));
     return newItem.id;
@@ -102,7 +90,6 @@ const App: React.FC = () => {
   const updateSetupResultInHistory = (setupKey: 'setup_A' | 'setup_B', newResult: SetupResult) => {
     if (!activeHistoryId || !result) return;
 
-    // 1. Update Current View State
     const updatedData = {
         ...result,
         setups: {
@@ -115,7 +102,6 @@ const App: React.FC = () => {
     };
     setResult(updatedData);
 
-    // 2. Update Persistence
     const updatedHistory = history.map(item => {
         if (item.id === activeHistoryId) {
             return { ...item, data: updatedData };
@@ -142,15 +128,14 @@ const App: React.FC = () => {
       setPreviewUrl(URL.createObjectURL(selectedFile));
       setResult(null);
       setError(null);
+      setActiveHistoryId(null);
     }
   };
 
   const triggerAnalysis = async () => {
     if (!file) return;
-
     setIsAnalyzing(true);
     setError(null);
-
     try {
       const data = await analyzeChart(file, lang);
       setResult(data);
@@ -179,11 +164,7 @@ const App: React.FC = () => {
       <main className="container mx-auto pb-12">
         
         {(!subscription || isExpired) ? (
-            <PricingScreen 
-                onSelectPlan={handleSelectPlan} 
-                lang={lang} 
-                isExpired={isExpired} 
-            />
+            <PricingScreen onSelectPlan={handleSelectPlan} lang={lang} isExpired={isExpired} />
         ) : (
             <>
                 {activeView === 'analytics' ? (
@@ -192,33 +173,38 @@ const App: React.FC = () => {
                     <>
                         {!file && !result && (
                           <div className="flex flex-col items-center min-h-[calc(100vh-100px)] px-4 py-12">
-                            <div className="mb-8 flex items-center gap-3">
-                                 <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded border ${subscription.plan === 'gold' ? 'border-institutional-accent text-institutional-accent bg-institutional-accent/10' : 'border-institutional-muted text-institutional-muted'}`}>
-                                     PLAN: {subscription.plan?.toUpperCase()}
-                                 </span>
-                                 {subscription.plan === 'silver' && (
-                                     <span className="text-[10px] text-institutional-muted font-mono">
-                                         Days left: {Math.max(0, 30 - Math.floor((Date.now() - subscription.startDate) / (1000 * 60 * 60 * 24)))}
+                            <div className="mb-12 flex items-center gap-4">
+                                 <div className="bg-institutional-card border border-institutional-border px-4 py-2 rounded-full flex items-center gap-3">
+                                     <span className="w-2 h-2 rounded-full bg-institutional-accent animate-pulse"></span>
+                                     <span className="text-[10px] uppercase font-bold text-white tracking-widest font-mono">
+                                         {subscription.plan?.toUpperCase()} ACCESS GRANTED
                                      </span>
-                                 )}
+                                 </div>
                             </div>
 
                             <div 
-                                className="w-full max-w-xl border-2 border-dashed border-institutional-border bg-institutional-card/50 rounded-2xl p-12 text-center transition-all hover:border-institutional-accent/50 hover:bg-institutional-card cursor-pointer group mb-16"
+                                className="w-full max-w-2xl border-2 border-dashed border-institutional-border bg-institutional-card/30 rounded-3xl p-16 text-center transition-all hover:border-institutional-accent/40 hover:bg-institutional-card/50 cursor-pointer group mb-20 shadow-2xl"
                                 onClick={() => fileInputRef.current?.click()}
                             >
-                                <div className="w-16 h-16 bg-institutional-bg rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 border border-institutional-border group-hover:border-institutional-accent">
+                                <div className="w-20 h-20 bg-institutional-bg rounded-2xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform duration-500 border border-institutional-border group-hover:border-institutional-accent/50 group-hover:shadow-[0_0_30px_rgba(0,220,130,0.2)]">
                                     <IconUpload className="text-institutional-muted group-hover:text-institutional-accent" size={32} />
                                 </div>
-                                <h2 className="text-2xl font-bold text-white mb-2">{t.upload_title}</h2>
-                                <p className="text-institutional-muted font-mono text-sm mb-8">{t.upload_desc}</p>
+                                <h2 className="text-3xl font-bold text-white mb-4 tracking-tight">{t.upload_title}</h2>
+                                <p className="text-institutional-muted font-mono text-sm mb-10 max-w-xs mx-auto leading-relaxed">{t.upload_desc}</p>
                                 <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileSelect} />
+                                
+                                <div className="inline-flex items-center px-4 py-2 bg-institutional-bg/50 border border-institutional-border rounded-lg text-[10px] text-institutional-muted font-mono uppercase tracking-[0.2em]">
+                                    {t.supports}
+                                </div>
                             </div>
 
-                            <div className="w-full max-w-xl">
-                              <div className="flex items-center space-x-2 mb-4">
-                                 <IconScan className="text-institutional-muted" size={16} />
-                                 <h3 className="text-xs font-mono text-institutional-muted uppercase tracking-wider">{t.history_title}</h3>
+                            <div className="w-full max-w-2xl">
+                              <div className="flex items-center justify-between mb-6">
+                                 <div className="flex items-center space-x-3">
+                                     <IconScan className="text-institutional-accent" size={18} />
+                                     <h3 className="text-xs font-mono font-bold text-white uppercase tracking-[0.2em]">{t.history_title}</h3>
+                                 </div>
+                                 <span className="text-[10px] font-mono text-institutional-muted">{history.length} / 20</span>
                               </div>
                               <HistoryList history={history} onSelect={loadHistoryItem} lang={lang} />
                             </div>
@@ -226,21 +212,21 @@ const App: React.FC = () => {
                         )}
 
                         {file && !result && (
-                            <div className="max-w-4xl mx-auto mt-12 px-6">
-                                <div className="bg-institutional-card border border-institutional-border rounded-xl overflow-hidden shadow-2xl">
-                                    <div className="relative aspect-video bg-black/50 flex items-center justify-center group">
+                            <div className="max-w-5xl mx-auto mt-12 px-6 animate-in zoom-in-95 duration-500">
+                                <div className="bg-institutional-card border border-institutional-border rounded-3xl overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)]">
+                                    <div className="relative aspect-video bg-black/40 flex items-center justify-center group border-b border-institutional-border">
                                         {previewUrl && (
-                                            <img src={previewUrl} alt="Chart Preview" className="max-h-full max-w-full object-contain" />
+                                            <img src={previewUrl} alt="Chart Preview" className="max-h-full max-w-full object-contain p-4" />
                                         )}
-                                        <button onClick={reset} className="absolute top-4 right-4 bg-black/60 hover:bg-black/80 text-white px-3 py-1 rounded-md text-xs font-mono backdrop-blur border border-white/10">
+                                        <button onClick={reset} className="absolute top-6 right-6 bg-black/80 hover:bg-black text-white px-4 py-2 rounded-xl text-[10px] font-bold font-mono tracking-widest backdrop-blur border border-white/10 transition-all">
                                             {t.cancel}
                                         </button>
                                     </div>
-                                    <div className="p-8 border-t border-institutional-border">
+                                    <div className="p-12">
                                         {!isAnalyzing ? (
-                                            <div className="flex flex-col items-center space-y-6">
-                                                <button onClick={triggerAnalysis} className="bg-institutional-accent hover:bg-emerald-400 text-black font-bold py-3 px-8 rounded-lg transition-all transform hover:scale-105 shadow-[0_0_20px_rgba(0,220,130,0.3)] flex items-center gap-2">
-                                                    <IconUpload size={20} />
+                                            <div className="flex flex-col items-center">
+                                                <button onClick={triggerAnalysis} className="bg-institutional-accent hover:bg-emerald-400 text-black font-bold py-4 px-12 rounded-2xl transition-all transform hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(0,220,130,0.4)] flex items-center gap-3 text-lg tracking-tight">
+                                                    <IconScan size={24} />
                                                     {t.run_engine}
                                                 </button>
                                             </div>
@@ -248,11 +234,11 @@ const App: React.FC = () => {
                                             <LoadingScreen lang={lang} />
                                         )}
                                         {error && (
-                                            <div className="mt-6 p-4 bg-rose-950/20 border border-rose-900/50 rounded-lg flex items-start gap-3">
-                                                <IconAlert className="text-rose-500 shrink-0 mt-0.5" size={18} />
+                                            <div className="mt-8 p-5 bg-rose-950/20 border border-rose-900/50 rounded-2xl flex items-start gap-4">
+                                                <IconAlert className="text-rose-500 shrink-0 mt-1" size={20} />
                                                 <div>
                                                     <h4 className="text-sm font-bold text-rose-400">{t.analysis_failed}</h4>
-                                                    <p className="text-xs text-rose-300/80 mt-1">{error}</p>
+                                                    <p className="text-xs text-rose-300/80 mt-1 font-mono leading-relaxed">{error}</p>
                                                 </div>
                                             </div>
                                         )}
@@ -263,16 +249,13 @@ const App: React.FC = () => {
 
                         {result && (
                             <div className="space-y-6">
-                                 <div className="max-w-7xl mx-auto px-6 pt-6 flex justify-between items-center">
-                                    <button onClick={reset} className="text-xs font-mono text-institutional-muted hover:text-white flex items-center gap-2">
-                                        ← {t.new_analysis}
+                                 <div className="max-w-7xl mx-auto px-6 pt-8 flex justify-between items-center">
+                                    <button onClick={reset} className="px-4 py-2 rounded-xl border border-institutional-border text-[10px] font-mono font-bold text-institutional-muted hover:text-white hover:border-institutional-muted transition-all flex items-center gap-3 uppercase tracking-widest">
+                                        <span className="text-institutional-accent text-lg">←</span>
+                                        {t.new_analysis}
                                     </button>
                                  </div>
-                                <Dashboard 
-                                    data={result} 
-                                    lang={lang} 
-                                    onUpdateSetupResult={updateSetupResultInHistory} 
-                                />
+                                <Dashboard data={result} lang={lang} onUpdateSetupResult={updateSetupResultInHistory} />
                             </div>
                         )}
                     </>
