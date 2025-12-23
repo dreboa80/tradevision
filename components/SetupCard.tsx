@@ -15,14 +15,15 @@ const SetupCard: React.FC<SetupCardProps> = ({ title, setup, bias, lang }) => {
   const t = translations[lang];
   const isBuy = bias === 'BUY';
   const isAggressive = setup.risk_profile === 'aggressive';
+  const isLowReliability = setup.reliability < 65;
   
-  const accentColor = isBuy ? 'text-emerald-400' : 'text-rose-400';
-  const borderColor = isBuy ? 'border-emerald-500/20' : 'border-rose-500/20';
-  const bgGradient = isBuy ? 'from-emerald-950/20' : 'from-rose-950/20';
+  const accentColor = isLowReliability ? 'text-amber-400' : (isBuy ? 'text-emerald-400' : 'text-rose-400');
+  const borderColor = isLowReliability ? 'border-amber-500/20' : (isBuy ? 'border-emerald-500/20' : 'border-rose-500/20');
+  const bgGradient = isLowReliability ? 'from-amber-950/10' : (isBuy ? 'from-emerald-950/20' : 'from-rose-950/20');
 
   return (
-    <div className={`border ${borderColor} bg-gradient-to-b ${bgGradient} to-institutional-card rounded-lg p-5 flex flex-col h-full relative overflow-hidden group shadow-xl`}>
-      <div className={`absolute top-0 left-0 w-1 h-full ${isBuy ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
+    <div className={`border ${borderColor} bg-gradient-to-b ${bgGradient} to-institutional-card rounded-lg p-5 flex flex-col h-full relative overflow-hidden group shadow-xl transition-all ${isLowReliability ? 'opacity-80' : 'opacity-100'}`}>
+      <div className={`absolute top-0 left-0 w-1 h-full ${isLowReliability ? 'bg-amber-500' : (isBuy ? 'bg-emerald-500' : 'bg-rose-500')}`}></div>
       
       <div className="flex justify-between items-start mb-4">
         <div>
@@ -35,17 +36,22 @@ const SetupCard: React.FC<SetupCardProps> = ({ title, setup, bias, lang }) => {
             }`}>
                 {isAggressive ? t.risk_aggressive : t.risk_conservative}
             </span>
+            {isLowReliability && (
+                 <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold border border-amber-500/50 bg-amber-500 text-black animate-pulse">
+                    {t.low_prob_badge}
+                 </span>
+            )}
           </div>
           <div className="flex items-center space-x-2">
             <span className={`text-lg font-bold ${accentColor}`}>{setup.type.toUpperCase()}</span>
-            <span className="text-xs bg-institutional-border px-1.5 py-0.5 rounded text-institutional-muted font-mono">
+            <span className={`text-xs px-1.5 py-0.5 rounded font-mono ${isLowReliability ? 'bg-amber-500/20 text-amber-400' : 'bg-institutional-border text-institutional-muted'}`}>
               {setup.reliability}% {t.prob}
             </span>
           </div>
         </div>
       </div>
 
-      <div className="space-y-4 font-mono text-sm flex-grow">
+      <div className={`space-y-4 font-mono text-sm flex-grow ${isLowReliability ? 'filter grayscale-[0.5]' : ''}`}>
         <div className="flex items-center justify-between p-2 bg-institutional-bg/50 rounded border border-institutional-border group-hover:border-institutional-accent/30 transition-colors">
           <span className="text-institutional-muted">{t.entry}</span>
           <span className="font-bold text-white tracking-tight">{setup.entry}</span>
@@ -81,6 +87,14 @@ const SetupCard: React.FC<SetupCardProps> = ({ title, setup, bias, lang }) => {
           </p>
         </div>
       </div>
+
+      {isLowReliability && (
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="bg-amber-500 text-black text-[10px] font-bold px-4 py-2 rounded shadow-2xl transform -rotate-12 border-2 border-black">
+                  {t.low_confidence_title}
+              </div>
+          </div>
+      )}
     </div>
   );
 };
