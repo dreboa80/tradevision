@@ -26,6 +26,7 @@ export interface Setup {
   tp2: number | string;
   tp3: number | string;
   reliability: number;
+  risk_reward: string; // ex: "1:3"
   logic: string;
 }
 
