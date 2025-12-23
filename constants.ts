@@ -33,12 +33,6 @@ Tu dois raisonner **comme un desk institutionnel**, pas comme un trader retail.
 
 ---
 
-## LANGUE DE SORTIE
-Tout le contenu textuel dans le JSON (logic, reason, intent, traps, etc.) doit être en :
-**${lang === "fr" ? "FRANÇAIS" : "ENGLISH"}**.
-
----
-
 ## OBJECTIF GLOBAL
 À partir de l’image, tu dois :
 1. Identifier la **structure du marché**
@@ -209,3 +203,7 @@ Pour chaque setup (A et B), tu dois impérativement définir une **date et heure
   "limitations": []
 }
 \`\`\`
+
+## LANGUE DE SORTIE
+Tout le contenu textuel dans le JSON (logic, reason, intent, traps, etc.) doit être en :
+**${lang === "fr" ? "FRANÇAIS" : "ENGLISH"}**.
