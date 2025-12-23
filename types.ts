@@ -17,6 +17,8 @@ export interface InstitutionalReading {
   liquidity_objective: string;
 }
 
+export type SetupResult = 'WIN' | 'LOSS' | 'BE' | 'PENDING';
+
 export interface Setup {
   type: 'pullback' | 'confirmation';
   risk_profile: 'aggressive' | 'conservative';
@@ -26,8 +28,9 @@ export interface Setup {
   tp2: number | string;
   tp3: number | string;
   reliability: number;
-  risk_reward: string; // ex: "1:3"
+  risk_reward: string;
   logic: string;
+  user_result?: SetupResult; // Suivi manuel de l'utilisateur
 }
 
 export interface Setups {
