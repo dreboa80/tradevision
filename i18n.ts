@@ -54,6 +54,9 @@ export const translations = {
     low_confidence_desc: "The current structure lacks institutional clarity. Standing aside is recommended.",
     low_prob_badge: "LOW PROB",
     high_prob_badge: "HIGH PROB",
+    reveal_anyway_title: "SPECULATIVE SETUP",
+    reveal_anyway_desc: "Low probability but potential high RR. Manual verification required.",
+    btn_reveal_setup: "REVEAL HIGH-RISK DATA",
     // Pricing
     pricing_title: "SELECT ACCESS LEVEL",
     plan_silver: "SILVER",
@@ -129,6 +132,9 @@ export const translations = {
     low_confidence_desc: "La structure actuelle manque de clarté institutionnelle. Il est recommandé de rester à l'écart.",
     low_prob_badge: "FIAB. BASSE",
     high_prob_badge: "FIAB. HAUTE",
+    reveal_anyway_title: "SETUP SPÉCULATIF",
+    reveal_anyway_desc: "Faible fiabilité mais RR potentiel élevé. Vérification manuelle requise.",
+    btn_reveal_setup: "RÉVÉLER LES DONNÉES",
     // Pricing
     pricing_title: "NIVEAU D'ACCÈS",
     plan_silver: "SILVER",
