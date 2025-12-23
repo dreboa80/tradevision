@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Setup, SetupResult } from '../types';
-import { IconTarget, IconShield, IconArrowRight, IconAlert, IconCheck } from './Icons';
+import { IconTarget, IconShield, IconArrowRight, IconAlert, IconCheck, IconClock } from './Icons';
 import { Language, translations } from '../i18n';
 
 interface SetupCardProps {
@@ -40,22 +40,27 @@ const SetupCard: React.FC<SetupCardProps> = ({ title, setup, bias, lang, onUpdat
       
       {/* Header Info */}
       <div className="flex justify-between items-start mb-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-[10px] font-mono text-institutional-muted uppercase tracking-wider">{title}</h3>
-            <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold border ${
-                isAggressive 
-                ? 'border-amber-500/30 bg-amber-500/10 text-amber-500' 
-                : 'border-blue-500/30 bg-blue-500/10 text-blue-500'
-            }`}>
-                {isAggressive ? t.risk_aggressive : t.risk_conservative}
-            </span>
-            {isLowReliability && (
-                 <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold border border-amber-500/50 bg-amber-500 text-black">
-                    {t.low_prob_badge}
-                 </span>
+        <div className="w-full">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <h3 className="text-[10px] font-mono text-institutional-muted uppercase tracking-wider">{title}</h3>
+              <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold border ${
+                  isAggressive 
+                  ? 'border-amber-500/30 bg-amber-500/10 text-amber-500' 
+                  : 'border-blue-500/30 bg-blue-500/10 text-blue-500'
+              }`}>
+                  {isAggressive ? t.risk_aggressive : t.risk_conservative}
+              </span>
+            </div>
+            {setup.expiry && (
+              <div className="flex items-center gap-1 text-[9px] font-mono text-institutional-muted bg-black/40 px-2 py-0.5 rounded border border-institutional-border/50">
+                <IconClock size={10} className="text-institutional-accent" />
+                <span className="text-[8px] opacity-70 mr-1">{t.expires_at}</span>
+                <span className="font-bold text-white">{setup.expiry}</span>
+              </div>
             )}
           </div>
+          
           <div className="flex items-center space-x-2">
             <span className={`text-lg font-bold ${accentColor}`}>{setup.type.toUpperCase()}</span>
             <span className={`text-xs px-1.5 py-0.5 rounded font-mono ${isLowReliability ? 'bg-amber-500/20 text-amber-400' : 'bg-institutional-border text-institutional-muted'}`}>
