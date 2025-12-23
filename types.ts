@@ -1,3 +1,4 @@
+
 export interface MarketBias {
   direction: 'BUY' | 'SELL' | 'NEUTRAL';
   confidence: number;
@@ -18,6 +19,7 @@ export interface InstitutionalReading {
 
 export interface Setup {
   type: 'pullback' | 'confirmation';
+  risk_profile: 'aggressive' | 'conservative';
   entry: number | string;
   stop_loss: number | string;
   tp1: number | string;
@@ -58,5 +60,5 @@ export type PlanType = 'silver' | 'gold' | null;
 export interface SubscriptionStatus {
   plan: PlanType;
   startDate: number;
-  expiryDate?: number; // For Gold or checked against start date for Silver
+  expiryDate?: number;
 }
