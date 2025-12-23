@@ -13,19 +13,18 @@ Tu dois fournir DEUX approches distinctes pour le même actif :
 1. **SETUP A (Profil Agressif/Pullback)** :
    - Cible l'entrée la plus "profonde" dans une zone de valeur (FVG, Order Block).
    - Offre le meilleur Ratio Risque/Récompense.
-   - Entrée préventive avant la confirmation totale.
 
 2. **SETUP B (Profil Conservateur/Confirmation)** :
-   - Attend une cassure de structure (BOS/CHoCH) ou un signal de momentum.
-   - Priorise le taux de réussite (Win Rate) sur le ratio RR.
-   - Entrée sécurisée après preuve de l'intention institutionnelle.
+   - Attend une cassure de structure ou un signal de momentum.
+   - Priorise le taux de réussite (Win Rate).
 
 ---
 
 ## CONTRAINTES ABSOLUES
 1. **Précision décimale** : Respecte l'échelle exacte du graphique (ex: 1.05043, 2034.12).
-2. **Langue** : Tout le contenu textuel doit être en ${lang === 'fr' ? 'FRANÇAIS' : 'ENGLISH'}.
-3. **Sortie** : Uniquement le JSON.
+2. **Calcul RR** : Estime le ratio Risque/Récompense moyen par rapport au TP2.
+3. **Langue** : Tout le contenu textuel doit être en ${lang === 'fr' ? 'FRANÇAIS' : 'ENGLISH'}.
+4. **Sortie** : Uniquement le JSON.
 
 ---
 
@@ -60,6 +59,7 @@ Tu dois fournir DEUX approches distinctes pour le même actif :
       "tp2": "0.0000",
       "tp3": "0.0000",
       "reliability": 0,
+      "risk_reward": "1:X",
       "logic": ""
     },
     "setup_B": {
@@ -71,6 +71,7 @@ Tu dois fournir DEUX approches distinctes pour le même actif :
       "tp2": "0.0000",
       "tp3": "0.0000",
       "reliability": 0,
+      "risk_reward": "1:X",
       "logic": ""
     }
   },
