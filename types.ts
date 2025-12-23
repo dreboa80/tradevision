@@ -30,7 +30,8 @@ export interface Setup {
   reliability: number;
   risk_reward: string;
   logic: string;
-  user_result?: SetupResult; // Suivi manuel de l'utilisateur
+  expiry: string; // Date et heure d'expiration du signal
+  user_result?: SetupResult; 
 }
 
 export interface Setups {
