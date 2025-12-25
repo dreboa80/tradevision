@@ -5,7 +5,7 @@ import { Language } from '../i18n';
 
 export const analyzeChart = async (file: File, lang: Language): Promise<AnalysisResponse> => {
   // CRITICAL: Utilisation de la clé API correcte selon les directives
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
   const base64Data = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
