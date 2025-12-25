@@ -1,81 +1,62 @@
+
 import { GoogleGenAI } from "@google/genai";
-import { getTradingAnalysisPrompt } from '../constants';
 import { AnalysisResponse } from '../types';
 import { Language } from '../i18n';
+import { getTradingAnalysisPrompt } from '../constants';
 
 export const analyzeChart = async (file: File, lang: Language): Promise<AnalysisResponse> => {
-  // CRITICAL: Utilisation de la clé API correcte selon les directives
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
+  // 1. Conversion de l'image en Base64
   const base64Data = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onload = () => {
-      const result = reader.result as string;
-      const base64 = result.split(',')[1];
-      resolve(base64);
-    };
-    reader.onerror = error => reject(error);
+    reader.onload = () => resolve((reader.result as string).split(',')[1]);
+    reader.onerror = reject;
   });
 
-  const mimeType = file.type;
-  
-  // Formatage précis de la date de l'utilisateur pour le prompt
+  // 2. Préparation de l'heure locale
   const now = new Date();
   const currentTimeStr = now.toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-US', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hour12: false
   }).replace(',', '');
 
   try {
+    // 3. Initialisation directe du SDK Gemini (utilise la clé injectée process.env.API_KEY)
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    
+    // Utilisation de gemini-3-flash-preview : ultra-rapide et économique
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-flash-preview',
       contents: {
         parts: [
-          {
-            text: getTradingAnalysisPrompt(lang, currentTimeStr)
-          },
-          {
-            inlineData: {
-              mimeType: mimeType,
-              data: base64Data
-            }
-          }
+          { text: getTradingAnalysisPrompt(lang, currentTimeStr) },
+          { inlineData: { mimeType: file.type, data: base64Data } }
         ]
       },
       config: {
         temperature: 0.1,
-        thinkingConfig: { thinkingBudget: 4000 }
+        responseMimeType: "application/json",
+        // Désactivation du thinking pour une réponse éclair
+        thinkingConfig: { thinkingBudget: 0 }
       }
     });
 
     const text = response.text;
-    
-    if (!text) {
-      throw new Error("No response text from Gemini.");
+    if (!text) throw new Error("Le moteur n'a retourné aucune donnée.");
+
+    // Nettoyage du JSON au cas où des backticks markdown subsistent
+    let cleanJson = text.trim();
+    if (cleanJson.startsWith('```')) {
+      cleanJson = cleanJson.replace(/^```json\s*|```$/g, '').trim();
     }
 
-    let cleanText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-    const firstBrace = cleanText.indexOf('{');
-    const lastBrace = cleanText.lastIndexOf('}');
-    
-    if (firstBrace !== -1 && lastBrace !== -1) {
-      cleanText = cleanText.substring(firstBrace, lastBrace + 1);
-    }
-
-    try {
-      return JSON.parse(cleanText) as AnalysisResponse;
-    } catch (parseError) {
-      console.error("JSON Parsing Error. Raw text:", cleanText);
-      throw new Error("Failed to parse analysis results.");
-    }
+    return JSON.parse(cleanJson) as AnalysisResponse;
 
   } catch (error: any) {
-    console.error("Gemini API Error:", error);
-    throw error;
+    console.error("Gemini Engine Error:", error);
+    if (error.message?.includes('API_KEY')) {
+      throw new Error("Erreur de configuration : Clé API manquante ou invalide.");
+    }
+    throw new Error(error.message || "Le moteur de vision est indisponible pour le moment.");
   }
 };
