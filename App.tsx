@@ -94,18 +94,21 @@ const App: React.FC = () => {
 
   const triggerAnalysis = async () => {
     if (!file) return;
+    
     setIsAnalyzing(true);
     setError(null);
-    setResult(null); // Clear previous result
+    setResult(null); 
+    
     try {
       const data = await analyzeChart(file, lang);
       setResult(data);
       const id = saveToHistory(data);
       setActiveHistoryId(id);
     } catch (err: any) {
-      console.error("Trigger Analysis Error:", err);
-      setError(err.message || "An unexpected error occurred.");
+      console.error("Analysis failed:", err);
+      setError(err.message || "Le moteur n'a pas pu répondre à temps.");
     } finally {
+      // STOP loading dans tous les cas
       setIsAnalyzing(false);
     }
   };
