@@ -33,7 +33,7 @@ export const analyzeChart = async (file: File, lang: Language): Promise<Analysis
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview',
+      model: 'gemini-3-flash',
       contents: {
         parts: [
           {
