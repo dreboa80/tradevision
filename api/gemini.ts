@@ -1,57 +1,48 @@
-import { GoogleGenAI } from "@google/genai";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Vercel Serverless Function: POST /api/gemini
-// Body: { model: string, contents: { parts: any[] }, config?: object }
-export default async function handler(req: any, res: any) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // CORS / preflight safety (même si same-origin, ça évite surprises)
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+  if (req.method === "OPTIONS") {
+    return res.status(204).end();
+  }
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ ok: false, error: "Method Not Allowed" });
+  }
+
   try {
-    if (req.method !== "POST") {
-      res.statusCode = 405;
-      return res.end(JSON.stringify({ error: "METHOD_NOT_ALLOWED" }));
-    }
-
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      res.statusCode = 500;
-      return res.end(JSON.stringify({ error: "MISSING_GEMINI_API_KEY" }));
+      return res.status(500).json({ ok: false, error: "Missing GEMINI_API_KEY" });
     }
 
-    // Vercel may give req.body as object (when JSON) or as string.
-    let body: any = req.body;
-    if (!body) {
-      // Fallback: read raw body
-      const chunks: Buffer[] = [];
-      await new Promise<void>((resolve, reject) => {
-        req.on("data", (c: Buffer) => chunks.push(c));
-        req.on("end", () => resolve());
-        req.on("error", (e: any) => reject(e));
-      });
-      const raw = Buffer.concat(chunks).toString("utf-8");
-      body = raw ? JSON.parse(raw) : {};
-    } else if (typeof body === "string") {
-      body = JSON.parse(body);
+    const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+    const { model, contents, generationConfig } = body ?? {};
+
+    if (!contents) {
+      return res.status(400).json({ ok: false, error: "Missing 'contents' in body" });
     }
 
-    const { model, contents, config } = body || {};
-    if (!model || !contents?.parts || !Array.isArray(contents.parts)) {
-      res.statusCode = 400;
-      return res.end(JSON.stringify({ error: "INVALID_BODY", expected: "{model, contents:{parts:[...]}, config?}" }));
-    }
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const gm = genAI.getGenerativeModel({ model: model || "gemini-2.5-flash" });
 
-    const ai = new GoogleGenAI({ apiKey });
-
-    const result = await ai.models.generateContent({
-      model,
+    const result = await gm.generateContent({
       contents,
-      config
+      generationConfig,
     });
 
-    res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
-    // Keep response minimal: return only text to avoid leaking extra metadata.
-    return res.end(JSON.stringify({ text: (result as any).text ?? "" }));
-  } catch (err: any) {
-    res.setHeader("Content-Type", "application/json");
-    res.statusCode = 500;
-    return res.end(JSON.stringify({ error: "GEMINI_PROXY_ERROR", message: err?.message ?? String(err) }));
+    const text = result.response.text();
+    return res.status(200).json({ ok: true, text });
+  } catch (e: any) {
+    return res.status(500).json({
+      ok: false,
+      error: "Gemini proxy error",
+      details: e?.message || String(e),
+    });
   }
 }
