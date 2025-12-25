@@ -2,46 +2,40 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // CORS / preflight safety (même si same-origin, ça évite surprises)
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
-  if (req.method === "OPTIONS") {
-    return res.status(204).end();
-  }
-
-  if (req.method !== "POST") {
-    return res.status(405).json({ ok: false, error: "Method Not Allowed" });
-  }
-
   try {
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
+
+    if (req.method !== "POST") {
+      return res.status(405).json({ ok: false, error: "Method Not Allowed", method: req.method });
+    }
+
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      return res.status(500).json({ ok: false, error: "Missing GEMINI_API_KEY" });
+      return res.status(500).json({ ok: false, error: "Missing GEMINI_API_KEY env var" });
     }
 
     const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
     const { model, contents, generationConfig } = body ?? {};
 
-    if (!contents) {
-      return res.status(400).json({ ok: false, error: "Missing 'contents' in body" });
+    if (!Array.isArray(contents)) {
+      return res.status(400).json({
+        ok: false,
+        error: "Invalid payload: 'contents' must be an array",
+        receivedType: typeof contents,
+      });
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const gm = genAI.getGenerativeModel({ model: model || "gemini-2.5-flash" });
 
-    const result = await gm.generateContent({
-      contents,
-      generationConfig,
-    });
+    const result = await gm.generateContent({ contents, generationConfig });
 
-    const text = result.response.text();
-    return res.status(200).json({ ok: true, text });
+    return res.status(200).json({ ok: true, text: result.response.text() });
   } catch (e: any) {
+    // IMPORTANT: on renvoie toujours un JSON même si ça crash
     return res.status(500).json({
       ok: false,
-      error: "Gemini proxy error",
+      error: "Gemini proxy crashed",
       details: e?.message || String(e),
     });
   }
